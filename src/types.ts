@@ -1,7 +1,9 @@
+
 export type Founder = {
   id: number;
   name: string;
   target: number;
+  access_key: string;
 };
 
 export type RevenueEntry = {

@@ -1,6 +1,7 @@
+
 import { useState, useMemo, FC } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, RadialBarChart, RadialBar, PolarAngleAxis, Tooltip } from 'recharts';
-import { DashboardData, Post } from '../types';
+import { DashboardData, Post, Founder } from '../types';
 import { Modal } from './Modal';
 
 // --- Icons ---
@@ -18,6 +19,7 @@ type TeamDashboardProps = {
     updatePost: (post: {id: number, text: string, type: 'win' | 'blocker'}) => void;
     deletePost: (postId: number) => void;
     isSubmitting: boolean;
+    loggedInUser: Founder;
 };
 
 type EditPostFormProps = {
@@ -28,7 +30,7 @@ type EditPostFormProps = {
 };
 
 type PostFormProps = {
-    founders: DashboardData['founders'];
+    loggedInUser: Founder;
     addPost: TeamDashboardProps['addPost'];
     isSubmitting: boolean;
 };
@@ -56,24 +58,20 @@ const EditPostForm: FC<EditPostFormProps> = ({ post, onSave, onCancel, isSubmitt
     );
 };
 
-const PostForm: FC<PostFormProps> = ({ founders, addPost, isSubmitting }) => {
+const PostForm: FC<PostFormProps> = ({ loggedInUser, addPost, isSubmitting }) => {
     const [text, setText] = useState('');
     const [type, setType] = useState<'win' | 'blocker'>('win');
-    const [authorId, setAuthorId] = useState(founders[0]?.id || 1);
-    const handleSubmit = (ev: React.FormEvent) => { ev.preventDefault(); if (!text.trim() || !authorId) return; addPost(text, type, authorId); setText(''); };
+    const handleSubmit = (ev: React.FormEvent) => { ev.preventDefault(); if (!text.trim()) return; addPost(text, type, loggedInUser.id); setText(''); };
     
     return (
         <form onSubmit={handleSubmit} className="mt-8 p-6 bg-[#F5F4EF] rounded-xl border border-[#929A8A]/50">
-            <h3 className="text-xl font-semibold mb-4 flex items-center"><LightBulbIcon className="h-6 w-6 mr-2 text-[#004225]" /> Share an Update</h3>
+            <h3 className="text-xl font-semibold mb-4 flex items-center"><LightBulbIcon className="h-6 w-6 mr-2 text-[#004225]" /> Share an Update as {loggedInUser.name}</h3>
             <textarea value={text} onChange={e => setText(e.target.value)} placeholder="What's on your mind? Landed a new deal? Facing a roadblock?" className="w-full bg-white border border-[#929A8A]/50 rounded-md p-3 text-[#1A1A1A] placeholder-[#929A8A] focus:ring-2 focus:ring-[#C4FF00] focus:outline-none transition" rows={3}></textarea>
             <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
                 <div className="flex items-center space-x-4">
                     <select value={type} onChange={e => setType(e.target.value as 'win' | 'blocker')} className="bg-white border border-[#929A8A]/50 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#C4FF00]">
                         <option value="win">✅ Win</option>
                         <option value="blocker">⚠️ Blocker</option>
-                    </select>
-                    <select value={authorId} onChange={e => setAuthorId(Number(e.target.value))} className="bg-white border border-[#929A8A]/50 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#C4FF00]">
-                        {founders.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
                     </select>
                 </div>
                 <button type="submit" className="w-full sm:w-auto bg-[#004225] hover:bg-opacity-90 text-[#F5F4EF] font-bold py-2 px-6 rounded-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled={!text.trim() || isSubmitting}>
@@ -86,7 +84,7 @@ const PostForm: FC<PostFormProps> = ({ founders, addPost, isSubmitting }) => {
 
 
 // --- Main TeamDashboard Component ---
-const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, deletePost, isSubmitting }) => {
+const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, deletePost, isSubmitting, loggedInUser }) => {
     const { totalTarget, totalMonths, currentMonth, founders, revenueEntries, posts, sprintStartYear, sprintStartMonth } = data;
     const [editingPost, setEditingPost] = useState<Post | null>(null);
 
@@ -188,7 +186,7 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
                         </div>
                     </div>
                 </div>
-                <PostForm founders={founders} addPost={addPost} isSubmitting={isSubmitting} />
+                <PostForm loggedInUser={loggedInUser} addPost={addPost} isSubmitting={isSubmitting} />
             </div>
         </div>
     );

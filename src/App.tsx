@@ -1,7 +1,9 @@
+
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { DashboardData } from './types';
+import { DashboardData, Founder } from './types';
 import TeamDashboard from './components/TeamDashboard';
 import IndividualDashboard from './components/IndividualDashboard';
+import LoginScreen from './components/LoginScreen';
 import { supabase } from './supabase';
 
 const ChevronDownIcon = ({ className = '' }: { className?: string }) => (
@@ -11,6 +13,7 @@ const ChevronDownIcon = ({ className = '' }: { className?: string }) => (
 );
 
 const App = () => {
+    const [loggedInUser, setLoggedInUser] = useState<Founder | null>(null);
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,6 +21,7 @@ const App = () => {
     const [selectedViewId, setSelectedViewId] = useState<number | 'team'>('team');
 
     const refreshData = useCallback(async () => {
+        if (!loggedInUser) return; // Don't fetch if not logged in
         setIsLoading(true);
         try {
             const [configRes, foundersRes, revenueRes, postsRes] = await Promise.all([
@@ -55,24 +59,25 @@ const App = () => {
             setIsLoading(false);
             setIsSubmitting(false);
         }
-    }, []);
+    }, [loggedInUser]);
 
+    // This effect handles fetching data AFTER a user logs in.
     useEffect(() => {
-        refreshData();
-    }, [refreshData]);
+        if (loggedInUser) {
+            refreshData();
+            setSelectedViewId(loggedInUser.id); // Default to the logged-in user's view
+        }
+    }, [loggedInUser, refreshData]);
 
     const runMutation = async (mutation: PromiseLike<any>) => {
         setIsSubmitting(true);
         try {
             const { error } = await mutation;
             if (error) throw error;
-            // After a successful mutation, we re-fetch all data to ensure the UI is in sync.
-            // We don't turn off isSubmitting here, refreshData will do it in its `finally` block.
             await refreshData();
         } catch (err: any) {
             console.error('Mutation failed:', err);
             alert(`An error occurred: ${err.message}`);
-            // Only stop submitting on failure, as success is handled by refreshData
             setIsSubmitting(false);
         }
     };
@@ -100,16 +105,26 @@ const App = () => {
     const deleteRevenueEntry = useCallback((entryId: number) => {
         runMutation(supabase.from('revenue').delete().eq('id', entryId));
     }, []);
+    
+    const handleLogout = () => {
+        setLoggedInUser(null);
+        setDashboardData(null);
+        setSelectedViewId('team');
+    };
 
     const selectedFounder = useMemo(() => dashboardData?.founders.find(f => f.id === selectedViewId), [selectedViewId, dashboardData?.founders]);
     const handleViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => setSelectedViewId(e.target.value === 'team' ? 'team' : Number(e.target.value));
+
+    if (!loggedInUser) {
+        return <LoginScreen onLoginSuccess={setLoggedInUser} />;
+    }
 
     if (isLoading && !dashboardData) {
         return (
             <div className="flex flex-col justify-center items-center min-h-screen text-center p-4">
                 <div className="font-atkinson text-5xl font-bold italic text-[#C4FF00]">heuristiq</div>
                 <h1 className="text-3xl font-bold tracking-tighter mt-2">Mission Control</h1>
-                <p className="mt-8 text-xl animate-pulse">Loading Dashboard...</p>
+                <p className="mt-8 text-xl animate-pulse">Loading Dashboard for {loggedInUser.name}...</p>
             </div>
         );
     }
@@ -120,6 +135,7 @@ const App = () => {
                 <div className="font-atkinson text-5xl font-bold italic text-red-500">heuristiq</div>
                 <h1 className="text-3xl font-bold tracking-tighter mt-2 text-red-600">Loading Error</h1>
                 <p className="mt-4 text-lg text-red-700 max-w-2xl">{error}</p>
+                <button onClick={handleLogout} className="mt-8 bg-red-600 text-white font-bold py-2 px-6 rounded-md">Logout</button>
             </div>
         );
     }
@@ -133,18 +149,21 @@ const App = () => {
                     <span className="font-atkinson text-3xl font-bold italic text-[#C4FF00]">heuristiq</span>
                     <h1 className="text-2xl font-bold tracking-tighter">Mission Control</h1>
                 </div>
-                <div className="relative">
-                    <select value={selectedViewId} onChange={handleViewChange} className="appearance-none bg-white/10 border border-white/20 rounded-md py-2 pl-4 pr-10 text-[#F5F4EF] focus:outline-none focus:ring-2 focus:ring-[#C4FF00] cursor-pointer">
-                        <option value="team">Team View</option>
-                        {dashboardData.founders.map((founder) => <option key={founder.id} value={founder.id}>{founder.name}</option>)}
-                    </select>
-                    <ChevronDownIcon className="h-5 w-5 text-[#F5F4EF]/70 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <div className="flex items-center space-x-4">
+                    <div className="relative">
+                        <select value={selectedViewId} onChange={handleViewChange} className="appearance-none bg-white/10 border border-white/20 rounded-md py-2 pl-4 pr-10 text-[#F5F4EF] focus:outline-none focus:ring-2 focus:ring-[#C4FF00] cursor-pointer">
+                            <option value="team">Team View</option>
+                            {dashboardData.founders.map((founder) => <option key={founder.id} value={founder.id}>{founder.name}</option>)}
+                        </select>
+                        <ChevronDownIcon className="h-5 w-5 text-[#F5F4EF]/70 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
+                    <button onClick={handleLogout} className="bg-white/10 hover:bg-white/20 text-[#F5F4EF] font-bold py-2 px-4 rounded-md transition duration-200">Logout</button>
                 </div>
             </header>
             
             <main>
                 {(selectedViewId === 'team' || !selectedFounder) ?
-                    <TeamDashboard data={dashboardData} addPost={addPost} updatePost={updatePost} deletePost={deletePost} isSubmitting={isSubmitting} /> :
+                    <TeamDashboard data={dashboardData} addPost={addPost} updatePost={updatePost} deletePost={deletePost} isSubmitting={isSubmitting} loggedInUser={loggedInUser} /> :
                     <IndividualDashboard founder={selectedFounder} allData={dashboardData} addRevenueEntry={addRevenueEntry} updateRevenueEntry={updateRevenueEntry} deleteRevenueEntry={deleteRevenueEntry} isSubmitting={isSubmitting} />}
             </main>
 
