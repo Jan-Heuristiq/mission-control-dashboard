@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { DashboardData, Founder } from './types';
+import { DashboardData } from './types';
 import TeamDashboard from './components/TeamDashboard';
 import IndividualDashboard from './components/IndividualDashboard';
 import { supabase } from './supabase';
@@ -18,6 +18,7 @@ const App = () => {
     const [selectedViewId, setSelectedViewId] = useState<number | 'team'>('team');
 
     const refreshData = useCallback(async () => {
+        setIsLoading(true);
         try {
             const [configRes, foundersRes, revenueRes, postsRes] = await Promise.all([
                 supabase.from('config').select('*'),
@@ -60,25 +61,45 @@ const App = () => {
         refreshData();
     }, [refreshData]);
 
-    const handleMutation = async (action: Promise<any>) => {
+    const runMutation = async (mutation: PromiseLike<any>) => {
         setIsSubmitting(true);
         try {
-            const { error } = await action;
+            const { error } = await mutation;
             if (error) throw error;
+            // After a successful mutation, we re-fetch all data to ensure the UI is in sync.
+            // We don't turn off isSubmitting here, refreshData will do it in its `finally` block.
             await refreshData();
         } catch (err: any) {
             console.error('Mutation failed:', err);
             alert(`An error occurred: ${err.message}`);
-            setIsSubmitting(false); // only stop submitting on failure
+            // Only stop submitting on failure, as success is handled by refreshData
+            setIsSubmitting(false);
         }
     };
+
+    const addPost = useCallback((postText: string, type: 'win' | 'blocker', author_id: number) => {
+        runMutation(supabase.from('posts').insert({ author_id, text: postText, type }));
+    }, []);
     
-    const addPost = useCallback((postText: string, type: 'win' | 'blocker', author_id: number) => handleMutation(supabase.from('posts').insert({ author_id, text: postText, type })), []);
-    const updatePost = useCallback((updatedPost: {id: number, text: string, type: 'win' | 'blocker'}) => handleMutation(supabase.from('posts').update({ text: updatedPost.text, type: updatedPost.type }).eq('id', updatedPost.id)), []);
-    const deletePost = useCallback((postId: number) => handleMutation(supabase.from('posts').delete().eq('id', postId)), []);
-    const addRevenueEntry = useCallback((entry: { founder_id: number; amount: number; date: string; }) => handleMutation(supabase.from('revenue').insert(entry)), []);
-    const updateRevenueEntry = useCallback((updatedEntry: {id: number, amount: number, date: string}) => handleMutation(supabase.from('revenue').update({ amount: updatedEntry.amount, date: updatedEntry.date }).eq('id', updatedEntry.id)), []);
-    const deleteRevenueEntry = useCallback((entryId: number) => handleMutation(supabase.from('revenue').delete().eq('id', entryId)), []);
+    const updatePost = useCallback((updatedPost: {id: number, text: string, type: 'win' | 'blocker'}) => {
+        runMutation(supabase.from('posts').update({ text: updatedPost.text, type: updatedPost.type }).eq('id', updatedPost.id));
+    }, []);
+    
+    const deletePost = useCallback((postId: number) => {
+        runMutation(supabase.from('posts').delete().eq('id', postId));
+    }, []);
+    
+    const addRevenueEntry = useCallback((entry: { founder_id: number; amount: number; date: string; }) => {
+        runMutation(supabase.from('revenue').insert(entry));
+    }, []);
+    
+    const updateRevenueEntry = useCallback((updatedEntry: {id: number, amount: number, date: string}) => {
+        runMutation(supabase.from('revenue').update({ amount: updatedEntry.amount, date: updatedEntry.date }).eq('id', updatedEntry.id));
+    }, []);
+    
+    const deleteRevenueEntry = useCallback((entryId: number) => {
+        runMutation(supabase.from('revenue').delete().eq('id', entryId));
+    }, []);
 
     const selectedFounder = useMemo(() => dashboardData?.founders.find(f => f.id === selectedViewId), [selectedViewId, dashboardData?.founders]);
     const handleViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => setSelectedViewId(e.target.value === 'team' ? 'team' : Number(e.target.value));
