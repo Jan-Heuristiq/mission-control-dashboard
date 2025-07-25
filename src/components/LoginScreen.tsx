@@ -19,7 +19,7 @@ const LoginScreen: FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         const fetchFounders = async () => {
             setIsLoading(true);
             try {
-                const { data, error } = await supabase.from('founders').select('id, name');
+                const { data, error } = await supabase.from('founders').select('*');
                 if (error) throw error;
                 setFounders(data || []);
                 if (data && data.length > 0) {
