@@ -7,8 +7,15 @@ type LoginScreenProps = {
     onLoginSuccess: (user: Founder) => void;
 };
 
+// This specific type is for the dropdown list only.
+// It prevents fetching sensitive data like access_key for all users.
+type LoginFounder = {
+    id: number;
+    name: string;
+};
+
 const LoginScreen: FC<LoginScreenProps> = ({ onLoginSuccess }) => {
-    const [founders, setFounders] = useState<Founder[]>([]);
+    const [founders, setFounders] = useState<LoginFounder[]>([]);
     const [selectedFounderId, setSelectedFounderId] = useState<string>('');
     const [accessKey, setAccessKey] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -19,11 +26,15 @@ const LoginScreen: FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         const fetchFounders = async () => {
             setIsLoading(true);
             try {
-                const { data, error } = await supabase.from('founders').select('*');
+                // Fetch ONLY the id and name for security and efficiency.
+                const { data, error } = await supabase.from('founders').select('id, name');
                 if (error) throw error;
-                setFounders(data || []);
-                if (data && data.length > 0) {
-                    setSelectedFounderId(String(data[0].id));
+                
+                const founderList = data || [];
+                setFounders(founderList);
+
+                if (founderList.length > 0) {
+                    setSelectedFounderId(String(founderList[0].id));
                 }
             } catch (err: any) {
                 setError(`Could not load founder list: ${err.message}. Please check your Supabase connection.`);
@@ -45,9 +56,11 @@ const LoginScreen: FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         setError(null);
 
         try {
+            // Securely verify the selected ID and the entered access key against the database.
+            // Supabase returns the full Founder object only on a successful match.
             const { data, error } = await supabase
                 .from('founders')
-                .select()
+                .select() // Selects all columns for the single matched user
                 .eq('id', selectedFounderId)
                 .eq('access_key', accessKey)
                 .single();
@@ -56,6 +69,7 @@ const LoginScreen: FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                 throw new Error('Invalid name or access key. Please try again.');
             }
             
+            // On success, pass the full, verified user object up.
             onLoginSuccess(data);
 
         } catch (err: any) {
