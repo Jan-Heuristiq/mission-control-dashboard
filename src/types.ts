@@ -11,6 +11,7 @@ export type RevenueEntry = {
   founder_id: number;
   amount: number;
   date: string;
+  description?: string | null;
 };
 
 export type Post = {

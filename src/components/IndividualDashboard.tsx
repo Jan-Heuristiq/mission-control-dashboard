@@ -11,8 +11,8 @@ const TrashIcon = ({ className = '' }: { className?: string }) => <svg xmlns="ht
 type IndividualDashboardProps = {
     founder: Founder;
     allData: DashboardData;
-    addRevenueEntry: (entry: { founder_id: number; amount: number; date: string; }) => void;
-    updateRevenueEntry: (entry: {id: number, amount: number, date: string}) => void;
+    addRevenueEntry: (entry: { founder_id: number; amount: number; date: string; description?: string | null }) => void;
+    updateRevenueEntry: (entry: Partial<RevenueEntry>) => void;
     deleteRevenueEntry: (entryId: number) => void;
     isSubmitting: boolean;
 };
@@ -26,7 +26,7 @@ type StatCardProps = {
 
 type RevenueFormProps = {
     entry?: Partial<RevenueEntry>;
-    onSave: (data: { amount: number; date: string }) => void;
+    onSave: (data: { amount: number; date: string; description: string | null }) => void;
     onCancel: () => void;
     isSubmitting: boolean;
 };
@@ -43,7 +43,12 @@ const StatCard: FC<StatCardProps> = ({ label, value, subtext, className = '' }) 
 const RevenueForm: FC<RevenueFormProps> = ({ entry, onSave, onCancel, isSubmitting }) => {
     const [amount, setAmount] = useState(entry?.amount || '');
     const [date, setDate] = useState(entry?.date || new Date().toISOString().split('T')[0]);
-    const handleSubmit = (ev: React.FormEvent) => { ev.preventDefault(); onSave({ amount: Number(amount), date }); };
+    const [description, setDescription] = useState(entry?.description || '');
+
+    const handleSubmit = (ev: React.FormEvent) => { 
+        ev.preventDefault(); 
+        onSave({ amount: Number(amount), date, description: description || null }); 
+    };
     
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -54,6 +59,10 @@ const RevenueForm: FC<RevenueFormProps> = ({ entry, onSave, onCancel, isSubmitti
             <div>
                 <label htmlFor="date" className="block text-sm font-medium text-[#1A1A1A]">Date</label>
                 <input type="date" id="date" value={date} onChange={e => setDate(e.target.value)} required className="mt-1 w-full bg-white border border-[#929A8A]/50 rounded-md p-2 text-[#1A1A1A] focus:ring-2 focus:ring-[#C4FF00] focus:outline-none" />
+            </div>
+            <div>
+                <label htmlFor="description" className="block text-sm font-medium text-[#1A1A1A]">Short Name (Optional)</label>
+                <input type="text" id="description" value={description || ''} onChange={e => setDescription(e.target.value)} placeholder="e.g., Project Phoenix MRR" className="mt-1 w-full bg-white border border-[#929A8A]/50 rounded-md p-2 text-[#1A1A1A] placeholder-[#929A8A] focus:ring-2 focus:ring-[#C4FF00] focus:outline-none" />
             </div>
             <div className="flex justify-end space-x-2 pt-2">
                 <button type="button" onClick={onCancel} className="bg-[#929A8A] hover:bg-opacity-90 text-[#1A1A1A] font-bold py-2 px-4 rounded-md transition" disabled={isSubmitting}>Cancel</button>
@@ -84,7 +93,7 @@ const IndividualDashboard: FC<IndividualDashboardProps> = ({ founder, allData, a
 
     const formatCurrency = (value: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
     
-    const handleSaveRevenue = (data: { amount: number; date: string }) => {
+    const handleSaveRevenue = (data: { amount: number; date: string; description: string | null; }) => {
         if (modalState.mode === 'add') { addRevenueEntry({ founder_id: founder.id, ...data }); }
         else if (modalState.mode === 'edit' && modalState.entry) { updateRevenueEntry({ ...modalState.entry, ...data }); }
         setModalState({ mode: 'closed' });
@@ -124,12 +133,13 @@ const IndividualDashboard: FC<IndividualDashboardProps> = ({ founder, allData, a
                 </div>
                 <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
                     {personalRevenueEntries.length > 0 ? personalRevenueEntries.map(entry => (
-                        <div key={entry.id} className="bg-white p-3 rounded-lg flex justify-between items-center">
+                        <div key={entry.id} className="bg-white p-3 rounded-lg flex justify-between items-center group">
                             <div>
                                 <p className="font-bold text-[#1A1A1A]">{formatCurrency(entry.amount)}</p>
+                                {entry.description && <p className="text-sm font-medium text-[#1A1A1A]">{entry.description}</p>}
                                 <p className="text-sm text-[#929A8A]">{new Date(entry.date).toLocaleDateString()}</p>
                             </div>
-                            <div className="flex space-x-3">
+                            <div className="flex space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button onClick={() => setModalState({ mode: 'edit', entry })} aria-label="Edit revenue entry" disabled={isSubmitting}><PencilIcon className="h-5 w-5 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
                                 <button onClick={() => handleDeleteRevenue(entry.id)} aria-label="Delete revenue entry" disabled={isSubmitting}><TrashIcon className="h-5 w-5 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
                             </div>

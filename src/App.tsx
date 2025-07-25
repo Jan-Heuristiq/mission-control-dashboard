@@ -1,6 +1,6 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { DashboardData, Founder } from './types';
+import { DashboardData, Founder, RevenueEntry } from './types';
 import TeamDashboard from './components/TeamDashboard';
 import IndividualDashboard from './components/IndividualDashboard';
 import LoginScreen from './components/LoginScreen';
@@ -69,7 +69,7 @@ const App = () => {
         }
     }, [loggedInUser, refreshData]);
 
-    const runMutation = async (mutation: PromiseLike<any>) => {
+    const runMutation = useCallback(async (mutation: PromiseLike<any>) => {
         setIsSubmitting(true);
         try {
             const { error } = await mutation;
@@ -80,31 +80,31 @@ const App = () => {
             alert(`An error occurred: ${err.message}`);
             setIsSubmitting(false);
         }
-    };
+    }, [refreshData]);
 
     const addPost = useCallback((postText: string, type: 'win' | 'blocker', author_id: number) => {
         runMutation(supabase.from('posts').insert({ author_id, text: postText, type }));
-    }, []);
+    }, [runMutation]);
     
     const updatePost = useCallback((updatedPost: {id: number, text: string, type: 'win' | 'blocker'}) => {
         runMutation(supabase.from('posts').update({ text: updatedPost.text, type: updatedPost.type }).eq('id', updatedPost.id));
-    }, []);
+    }, [runMutation]);
     
     const deletePost = useCallback((postId: number) => {
         runMutation(supabase.from('posts').delete().eq('id', postId));
-    }, []);
+    }, [runMutation]);
     
-    const addRevenueEntry = useCallback((entry: { founder_id: number; amount: number; date: string; }) => {
+    const addRevenueEntry = useCallback((entry: { founder_id: number; amount: number; date: string; description?: string | null }) => {
         runMutation(supabase.from('revenue').insert(entry));
-    }, []);
+    }, [runMutation]);
     
-    const updateRevenueEntry = useCallback((updatedEntry: {id: number, amount: number, date: string}) => {
-        runMutation(supabase.from('revenue').update({ amount: updatedEntry.amount, date: updatedEntry.date }).eq('id', updatedEntry.id));
-    }, []);
+    const updateRevenueEntry = useCallback((updatedEntry: Partial<RevenueEntry>) => {
+        runMutation(supabase.from('revenue').update({ amount: updatedEntry.amount, date: updatedEntry.date, description: updatedEntry.description }).eq('id', updatedEntry.id!));
+    }, [runMutation]);
     
     const deleteRevenueEntry = useCallback((entryId: number) => {
         runMutation(supabase.from('revenue').delete().eq('id', entryId));
-    }, []);
+    }, [runMutation]);
     
     const handleLogout = () => {
         setLoggedInUser(null);
