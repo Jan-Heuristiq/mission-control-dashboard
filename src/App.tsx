@@ -1,17 +1,12 @@
 
 
+
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { DashboardData, Founder, RevenueEntry } from './types';
 import TeamDashboard from './components/TeamDashboard';
 import IndividualDashboard from './components/IndividualDashboard';
 import LoginScreen from './components/LoginScreen';
 import { supabase } from './supabase';
-
-const ChevronDownIcon = ({ className = '' }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-  </svg>
-);
 
 const App = () => {
     const [loggedInUser, setLoggedInUser] = useState<Founder | null>(null);
@@ -163,7 +158,7 @@ const App = () => {
                             <option value="team">Team View</option>
                             {dashboardData.founders.map((founder) => <option key={founder.id} value={founder.id}>{founder.name}</option>)}
                         </select>
-                        <ChevronDownIcon className="h-5 w-5 text-[#F5F4EF]/70 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <span aria-hidden="true" className="text-[#F5F4EF]/70 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▼</span>
                     </div>
                     <button onClick={handleLogout} className="bg-white/10 hover:bg-white/20 text-[#F5F4EF] font-bold py-2 px-4 rounded-md transition duration-200">Logout</button>
                 </div>

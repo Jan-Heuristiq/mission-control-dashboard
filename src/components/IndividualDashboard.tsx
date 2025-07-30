@@ -1,12 +1,8 @@
 
+
 import { useState, useMemo, FC } from 'react';
 import { Founder, DashboardData, RevenueEntry } from '../types';
 import { Modal } from './Modal';
-
-// --- Icons ---
-const PlusCircleIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
-const PencilIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>;
-const TrashIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.036-2.134H8.71c-1.126 0-2.037.955-2.037 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>;
 
 // --- Component Types ---
 type IndividualDashboardProps = {
@@ -164,7 +160,7 @@ const IndividualDashboard: FC<IndividualDashboardProps> = ({ founder, allData, a
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-bold text-[#1A1A1A]">Revenue Log</h3>
                     <button onClick={() => setModalState({ mode: 'add' })} className="flex items-center bg-[#004225] hover:bg-opacity-90 text-[#F5F4EF] font-bold py-2 px-4 rounded-md transition duration-200" disabled={isSubmitting}>
-                        <PlusCircleIcon className="h-5 w-5 mr-2" /> Add Entry
+                        <span role="img" aria-label="plus" className="mr-2">➕</span> Add Entry
                     </button>
                 </div>
                 <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
@@ -179,8 +175,8 @@ const IndividualDashboard: FC<IndividualDashboardProps> = ({ founder, allData, a
                                 <p className="text-sm text-[#929A8A]">{new Date(entry.date).toLocaleDateString()}</p>
                             </div>
                             <div className="flex space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => setModalState({ mode: 'edit', entry })} aria-label="Edit revenue entry" disabled={isSubmitting}><PencilIcon className="h-5 w-5 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
-                                <button onClick={() => handleDeleteRevenue(entry.id)} aria-label="Delete revenue entry" disabled={isSubmitting}><TrashIcon className="h-5 w-5 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
+                                <button onClick={() => setModalState({ mode: 'edit', entry })} aria-label="Edit revenue entry" disabled={isSubmitting} className="text-[#929A8A] hover:text-[#1A1A1A] text-xl">✏️</button>
+                                <button onClick={() => handleDeleteRevenue(entry.id)} aria-label="Delete revenue entry" disabled={isSubmitting} className="text-[#929A8A] hover:text-[#1A1A1A] text-xl">🗑️</button>
                             </div>
                         </div>
                     )) : <p className="text-[#929A8A] text-center py-8">No revenue entries logged yet.</p>}

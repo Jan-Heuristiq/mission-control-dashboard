@@ -1,19 +1,9 @@
 
+
 import { useState, useMemo, FC } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, RadialBarChart, RadialBar, PolarAngleAxis, Tooltip } from 'recharts';
 import { DashboardData, Post, Founder } from '../types';
 import { Modal } from './Modal';
-
-// --- Icons ---
-const ChartPieIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 100 15 7.5 7.5 0 000-15z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" /></svg>;
-const CheckCircleIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
-const ExclamationTriangleIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" /></svg>;
-const LightBulbIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-11.625a6.01 6.01 0 00-1.5-11.625m0 11.625a6.01 6.01 0 01-1.5-11.625m0 11.625c-3.313 0-6 2.687-6 6v5.25a2.25 2.25 0 002.25 2.25h8.5A2.25 2.25 0 0018 21v-5.25c0-3.313-2.687-6-6-6z" /></svg>;
-const PencilIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>;
-const TrashIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.036-2.134H8.71c-1.126 0-2.037.955-2.037 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>;
-const UsersIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.962a3.75 3.75 0 015.958 0m0 0a3.75 3.75 0 01-5.958 0M3 13.5g3.75 0 7.5 0M3 13.5V18c0 1.657 1.343 3 3 3h6c1.657 0 3-1.343 3-3v-4.5m-13.5 0c0-4.142 3.358-7.5 7.5-7.5s7.5 3.358 7.5 7.5" /></svg>;
-const SlackIcon = ({ className = '' }: { className?: string }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M94.12 315.5c-.31 0-.62-.03-.94-.06-12.3-1.1-22.38-12-21.28-24.3l1.7-19.6-19.6 1.7c-12.3 1.1-23.25-8.88-24.38-21.18S39.15 229.4 51.45 228.3l19.6-1.7-1.7-19.6c-1.1-12.3 8.88-23.25 21.18-24.38s23 8.88 24.3 21.18l-1.7 19.6 19.6-1.7c12.3-1.1 23.25 8.88 24.38 21.18s-8.88 23-21.18 24.3l-19.6 1.7 1.7 19.6c1.07 12.04-8.49 22.45-20.53 23.54l-.95 .09zm-22.69-142.2c.31 0 .62 .03 .94 .06 12.3 1.1 22.38 12 21.28 24.3l-1.7 19.6 19.6-1.7c12.3-1.1 23.25 8.88 24.38 21.18s-8.88 23-21.18 24.3l-19.6 1.7 1.7 19.6c1.1 12.3-8.88 23.25-21.18 24.38s-23-8.88-24.3-21.18l1.7-19.6-19.6 1.7c-12.3 1.1-23.25-8.88-24.38-21.18s8.88-23 21.18-24.3l19.6-1.7-1.7-19.6c-1.09-12.05 8.49-22.46 20.54-23.55l.95-.08zm229.3-100.8c-.31 0-.62-.03-.94-.06-12.3-1.1-22.38-12-21.28-24.3l1.7-19.6-19.6 1.7c-12.3 1.1-23.25-8.88-24.38-21.18s8.88-23 21.18-24.3l19.6-1.7-1.7-19.6c-1.1-12.3 8.88-23.25 21.18-24.38s23 8.88 24.3 21.18l-1.7 19.6 19.6-1.7c12.3-1.1 23.25 8.88 24.38 21.18s-8.88 23-21.18 24.3l-19.6 1.7 1.7 19.6c1.07 12.04-8.49 22.45-20.53 23.54l-.95 .09zm-22.69-142.2c.31 0 .62 .03 .94 .06 12.3 1.1 22.38 12 21.28 24.3l-1.7 19.6 19.6-1.7c12.3-1.1 23.25 8.88 24.38 21.18s-8.88 23-21.18 24.3l-19.6 1.7 1.7 19.6c1.1 12.3-8.88 23.25-21.18 24.38s-23-8.88-24.3-21.18l1.7-19.6-19.6 1.7c-12.3 1.1-23.25-8.88-24.38-21.18s8.88-23 21.18-24.3l19.6-1.7-1.7-19.6c-1.09-12.05 8.49-22.46 20.54-23.55l.95-.08z"/></svg>;
-
 
 // --- Component Types ---
 type TeamDashboardProps = {
@@ -58,7 +48,7 @@ const PostForm: FC<PostFormProps> = ({ loggedInUser, addPost, isSubmitting }) =>
     
     return (
         <form onSubmit={handleSubmit} className="mt-8 p-6 bg-[#F5F4EF] rounded-xl border border-[#929A8A]/50">
-            <h3 className="text-xl font-semibold mb-4 flex items-center"><LightBulbIcon className="h-6 w-6 mr-2 text-[#004225]" /> Share an Update as {loggedInUser.name}</h3>
+            <h3 className="text-xl font-semibold mb-4 flex items-center"><span role="img" aria-label="light bulb" className="mr-2 text-2xl">💡</span> Share an Update as {loggedInUser.name}</h3>
             <textarea value={text} onChange={e => setText(e.target.value)} placeholder="What's on your mind? Landed a new deal? Facing a roadblock?" className="w-full bg-white border border-[#929A8A]/50 rounded-md p-3 text-[#1A1A1A] placeholder-[#929A8A] focus:ring-2 focus:ring-[#C4FF00] focus:outline-none transition" rows={3}></textarea>
             <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
                 <select value={type} onChange={e => setType(e.target.value as 'win' | 'blocker')} className="bg-white border border-[#929A8A]/50 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#C4FF00]">
@@ -182,8 +172,8 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
             <div className="absolute top-2 right-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 {post.author_id === loggedInUser.id && (
                     <>
-                        <button onClick={() => setEditingPost(post)} aria-label="Edit post" disabled={isSubmitting}><PencilIcon className="h-4 w-4 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
-                        <button onClick={() => handleDeletePost(post.id)} aria-label="Delete post" disabled={isSubmitting}><TrashIcon className="h-4 w-4 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
+                        <button onClick={() => setEditingPost(post)} aria-label="Edit post" disabled={isSubmitting} className="text-[#929A8A] hover:text-[#1A1A1A] text-lg">✏️</button>
+                        <button onClick={() => handleDeletePost(post.id)} aria-label="Delete post" disabled={isSubmitting} className="text-[#929A8A] hover:text-[#1A1A1A] text-lg">🗑️</button>
                     </>
                 )}
             </div>
@@ -204,7 +194,7 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
                     disabled={isPostingToSlack}
                     className="flex items-center gap-2 bg-white text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-wait transition-colors"
                 >
-                    <SlackIcon className="h-5 w-5" />
+                    <span role="img" aria-label="megaphone">📢</span>
                     {isPostingToSlack ? 'Posting...' : 'Post Progress to Slack'}
                 </button>
             </div>
@@ -228,7 +218,7 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
                             <p className="text-sm text-[#929A8A] -mt-2 mb-2">{echodeckMission.description}</p>
                         </div>
                         <div className="text-right flex-shrink-0 ml-4">
-                            <h3 className="text-lg font-bold text-[#004225] flex items-center gap-2 justify-end"><UsersIcon className="h-6 w-6"/> Customers</h3>
+                            <h3 className="text-lg font-bold text-[#004225] flex items-center gap-2 justify-end">👥 Customers</h3>
                             <p className="text-2xl font-bold">{echodeckCustomers} / {echodeckMission.target_customers}</p>
                         </div>
                     </div>
@@ -254,7 +244,7 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
             </div>
 
             <div className="lg:col-span-2 bg-[#F5F4EF] p-6 rounded-xl border border-[#929A8A]/50 shadow-lg flex flex-col">
-                <h3 className="text-lg font-semibold mb-4 text-center flex items-center justify-center gap-2"><ChartPieIcon className="h-6 w-6 text-[#004225]" /> Total Revenue Contribution</h3>
+                <h3 className="text-lg font-semibold mb-4 text-center flex items-center justify-center gap-2">📊 Total Revenue Contribution</h3>
                 <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                         <Pie data={totalContributionData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} fill="#8884d8" paddingAngle={5} dataKey="value" nameKey="name">
@@ -269,13 +259,13 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
             <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="bg-[#F5F4EF] p-6 rounded-xl border border-[#929A8A]/50 shadow-lg flex flex-col">
-                        <h3 className="text-xl font-bold mb-4 text-[#004225] flex items-center gap-2"><CheckCircleIcon className="h-6 w-6" /> Key Wins</h3>
+                        <h3 className="text-xl font-bold mb-4 text-[#004225] flex items-center gap-2">✅ Key Wins</h3>
                         <div className="space-y-4 max-h-80 overflow-y-auto pr-2 flex-grow">
                             {wins.length > 0 ? wins.map(post => <PostItem key={post.id} post={post} />) : <p className="text-[#929A8A] text-center py-8">No wins posted yet.</p>}
                         </div>
                     </div>
                     <div className="bg-[#F5F4EF] p-6 rounded-xl border border-[#929A8A]/50 shadow-lg flex flex-col">
-                        <h3 className="text-xl font-bold mb-4 text-[#1A1A1A] flex items-center gap-2"><ExclamationTriangleIcon className="h-6 w-6" /> Current Blockers</h3>
+                        <h3 className="text-xl font-bold mb-4 text-[#1A1A1A] flex items-center gap-2">⚠️ Current Blockers</h3>
                         <div className="space-y-4 max-h-80 overflow-y-auto pr-2 flex-grow">
                             {blockers.length > 0 ? blockers.map(post => <PostItem key={post.id} post={post} />) : <p className="text-[#929A8A] text-center py-8">No blockers posted yet.</p>}
                         </div>
