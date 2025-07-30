@@ -1,4 +1,5 @@
 
+
 export type Founder = {
   id: number;
   name: string;
@@ -12,6 +13,8 @@ export type RevenueEntry = {
   amount: number;
   date: string;
   description?: string | null;
+  source: 'Heuristiq' | 'Echodeck';
+  is_new_customer: boolean;
 };
 
 export type Post = {
@@ -31,6 +34,8 @@ export type SecondaryMission = {
   id: number;
   name: string;
   description: string;
+  target_arr: number;
+  target_customers: number;
 };
 
 export type FounderSecondaryMission = {

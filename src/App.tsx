@@ -1,4 +1,5 @@
 
+
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { DashboardData, Founder, RevenueEntry } from './types';
 import TeamDashboard from './components/TeamDashboard';
@@ -100,12 +101,13 @@ const App = () => {
         runMutation(supabase.from('posts').delete().eq('id', postId));
     }, [runMutation]);
     
-    const addRevenueEntry = useCallback((entry: { founder_id: number; amount: number; date: string; description?: string | null }) => {
+    const addRevenueEntry = useCallback((entry: { founder_id: number; amount: number; date: string; description?: string | null; source: 'Heuristiq' | 'Echodeck'; is_new_customer: boolean; }) => {
         runMutation(supabase.from('revenue').insert(entry));
     }, [runMutation]);
     
     const updateRevenueEntry = useCallback((updatedEntry: Partial<RevenueEntry>) => {
-        runMutation(supabase.from('revenue').update({ amount: updatedEntry.amount, date: updatedEntry.date, description: updatedEntry.description }).eq('id', updatedEntry.id!));
+        const { id, amount, date, description, source, is_new_customer } = updatedEntry;
+        runMutation(supabase.from('revenue').update({ amount, date, description, source, is_new_customer }).eq('id', id!));
     }, [runMutation]);
     
     const deleteRevenueEntry = useCallback((entryId: number) => {
