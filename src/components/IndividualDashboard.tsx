@@ -1,7 +1,6 @@
 
-
 import { useState, useMemo, FC } from 'react';
-import { Founder, DashboardData, RevenueEntry, SecondaryMission } from '../types';
+import { Founder, DashboardData, RevenueEntry } from '../types';
 import { Modal } from './Modal';
 
 // --- Icons ---
