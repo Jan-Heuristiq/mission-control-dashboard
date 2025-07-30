@@ -11,6 +11,7 @@ const ExclamationTriangleIcon = ({ className = '' }: { className?: string }) => 
 const LightBulbIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-11.625a6.01 6.01 0 00-1.5-11.625m0 11.625a6.01 6.01 0 01-1.5-11.625m0 11.625c-3.313 0-6 2.687-6 6v5.25a2.25 2.25 0 002.25 2.25h8.5A2.25 2.25 0 0018 21v-5.25c0-3.313-2.687-6-6-6z" /></svg>;
 const PencilIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>;
 const TrashIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.036-2.134H8.71c-1.126 0-2.037.955-2.037 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>;
+const MissionTargetIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.63 2.18v4.8m5.96 5.38a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.314.06a6 6 0 01-2.924.06m5.214-2.82a6 6 0 00-5.214 2.82" /></svg>;
 
 // --- Component Types ---
 type TeamDashboardProps = {
@@ -85,7 +86,7 @@ const PostForm: FC<PostFormProps> = ({ loggedInUser, addPost, isSubmitting }) =>
 
 // --- Main TeamDashboard Component ---
 const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, deletePost, isSubmitting, loggedInUser }) => {
-    const { totalTarget, totalMonths, currentMonth, founders, revenueEntries, posts, sprintStartYear, sprintStartMonth } = data;
+    const { totalTarget, totalMonths, currentMonth, founders, revenueEntries, posts, sprintStartYear, sprintStartMonth, secondaryMissions, founderSecondaryMissions } = data;
     const [editingPost, setEditingPost] = useState<Post | null>(null);
 
     const totalRevenue = useMemo(() => revenueEntries.reduce((sum, entry) => sum + entry.amount, 0), [revenueEntries]);
@@ -121,8 +122,12 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
     const PostItem = ({ post }: { post: Post }) => (
         <div className="bg-white p-3 rounded-lg animate-fade-in relative group border border-transparent hover:border-[#929A8A]/50">
             <div className="absolute top-2 right-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => setEditingPost(post)} aria-label="Edit post" disabled={isSubmitting}><PencilIcon className="h-4 w-4 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
-                <button onClick={() => handleDeletePost(post.id)} aria-label="Delete post" disabled={isSubmitting}><TrashIcon className="h-4 w-4 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
+                {post.author_id === loggedInUser.id && (
+                    <>
+                        <button onClick={() => setEditingPost(post)} aria-label="Edit post" disabled={isSubmitting}><PencilIcon className="h-4 w-4 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
+                        <button onClick={() => handleDeletePost(post.id)} aria-label="Delete post" disabled={isSubmitting}><TrashIcon className="h-4 w-4 text-[#929A8A] hover:text-[#1A1A1A]" /></button>
+                    </>
+                )}
             </div>
             <p className="text-[#1A1A1A] pr-10">{post.text}</p>
             <p className="text-xs text-[#929A8A] mt-1">{`– ${getFounderName(post.author_id)} on ${new Date(post.timestamp).toLocaleDateString()}`}</p>
@@ -170,6 +175,38 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
                     </ResponsiveContainer>
                 </div>
             </div>
+
+            {secondaryMissions.length > 0 && (
+                <div className="space-y-6">
+                    {secondaryMissions.map(mission => {
+                        const assignments = founderSecondaryMissions.filter(asm => asm.mission_id === mission.id);
+                        return (
+                            <div key={mission.id} className="bg-[#F5F4EF] p-6 rounded-xl border border-[#929A8A]/50 shadow-lg">
+                                <h3 className="text-xl font-bold text-[#1A1A1A] flex items-center gap-2">
+                                    <MissionTargetIcon className="h-6 w-6 text-[#004225]" />
+                                    {mission.name}
+                                </h3>
+                                <p className="mt-2 text-[#1A1A1A] text-lg">{mission.description}</p>
+                                {assignments.length > 0 && (
+                                    <div className="mt-4">
+                                        <h4 className="font-semibold text-[#004225]">Assigned To:</h4>
+                                        <ul className="list-disc list-inside mt-2 text-[#1A1A1A] space-y-1">
+                                            {assignments.map(asm => {
+                                                const founderName = getFounderName(asm.founder_id);
+                                                return (
+                                                    <li key={asm.id}>
+                                                        {founderName}: <span className="font-bold">{asm.share_percentage}%</span>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
             
             <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

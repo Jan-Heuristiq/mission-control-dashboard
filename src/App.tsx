@@ -24,17 +24,21 @@ const App = () => {
         if (!loggedInUser) return; // Don't fetch if not logged in
         setIsLoading(true);
         try {
-            const [configRes, foundersRes, revenueRes, postsRes] = await Promise.all([
+            const [configRes, foundersRes, revenueRes, postsRes, secondaryMissionsRes, founderSecondaryMissionsRes] = await Promise.all([
                 supabase.from('config').select('*'),
                 supabase.from('founders').select('*'),
                 supabase.from('revenue').select('*'),
-                supabase.from('posts').select('*')
+                supabase.from('posts').select('*'),
+                supabase.from('secondary_missions').select('*'),
+                supabase.from('founder_secondary_missions').select('*')
             ]);
 
             if (configRes.error) throw new Error(`Config fetch failed: ${configRes.error.message}`);
             if (foundersRes.error) throw new Error(`Founders fetch failed: ${foundersRes.error.message}`);
             if (revenueRes.error) throw new Error(`Revenue fetch failed: ${revenueRes.error.message}`);
             if (postsRes.error) throw new Error(`Posts fetch failed: ${postsRes.error.message}`);
+            if (secondaryMissionsRes.error) throw new Error(`Secondary Missions fetch failed: ${secondaryMissionsRes.error.message}`);
+            if (founderSecondaryMissionsRes.error) throw new Error(`Founder Secondary Missions fetch failed: ${founderSecondaryMissionsRes.error.message}`);
 
             const configData = configRes.data.reduce((acc, { key, value }) => ({ ...acc, [key]: Number(value) || value }), {} as any);
             
@@ -48,6 +52,8 @@ const App = () => {
                 founders: foundersRes.data,
                 revenueEntries: revenueRes.data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
                 posts: postsRes.data.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()),
+                secondaryMissions: secondaryMissionsRes.data,
+                founderSecondaryMissions: founderSecondaryMissionsRes.data,
                 currentMonth: currentMonth
             };
             setDashboardData(data);

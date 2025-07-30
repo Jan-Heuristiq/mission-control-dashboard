@@ -1,11 +1,13 @@
+
 import { useState, useMemo, FC } from 'react';
-import { Founder, DashboardData, RevenueEntry } from '../types';
+import { Founder, DashboardData, RevenueEntry, SecondaryMission } from '../types';
 import { Modal } from './Modal';
 
 // --- Icons ---
 const PlusCircleIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 const PencilIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>;
 const TrashIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.036-2.134H8.71c-1.126 0-2.037.955-2.037 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>;
+const MissionTargetIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.63 2.18v4.8m5.96 5.38a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.314.06a6 6 0 01-2.924.06m5.214-2.82a6 6 0 00-5.214 2.82" /></svg>;
 
 // --- Component Types ---
 type IndividualDashboardProps = {
@@ -74,7 +76,7 @@ const RevenueForm: FC<RevenueFormProps> = ({ entry, onSave, onCancel, isSubmitti
 
 // --- Main IndividualDashboard Component ---
 const IndividualDashboard: FC<IndividualDashboardProps> = ({ founder, allData, addRevenueEntry, updateRevenueEntry, deleteRevenueEntry, isSubmitting }) => {
-    const { totalMonths, currentMonth, revenueEntries } = allData;
+    const { totalMonths, currentMonth, revenueEntries, secondaryMissions, founderSecondaryMissions } = allData;
     const [modalState, setModalState] = useState<{ mode: 'closed' | 'add' | 'edit'; entry?: RevenueEntry }>({ mode: 'closed' });
 
     const personalRevenueEntries = useMemo(() => revenueEntries.filter(entry => entry.founder_id === founder.id), [revenueEntries, founder.id]);
@@ -90,6 +92,17 @@ const IndividualDashboard: FC<IndividualDashboardProps> = ({ founder, allData, a
         else if (percentage >= 80) color = 'text-amber-600';
         return { pacingPercentage: percentage, pacingColor: color };
     }, [founder.target, totalMonths, currentMonth, personalRevenue]);
+
+    const personalMissions = useMemo(() => {
+        return founderSecondaryMissions
+            .filter(asm => asm.founder_id === founder.id)
+            .map(assignment => {
+                const mission = secondaryMissions.find(m => m.id === assignment.mission_id);
+                // Combine mission data with the personal share percentage
+                return mission ? { ...mission, share: assignment.share_percentage } : null;
+            })
+            .filter((mission): mission is (SecondaryMission & { share: number }) => mission !== null);
+    }, [founder.id, secondaryMissions, founderSecondaryMissions]);
 
     const formatCurrency = (value: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
     
@@ -119,10 +132,28 @@ const IndividualDashboard: FC<IndividualDashboardProps> = ({ founder, allData, a
                     </div>
                 </div>
             </div>
-            
+
             <div className="grid grid-cols-1 gap-8">
                 <StatCard label={`Pacing vs. ${totalMonths}-Month Goal`} value={<span className={pacingColor}>{`${pacingPercentage.toFixed(0)}%`}</span>} subtext={`of expected revenue for Month ${currentMonth}`} />
             </div>
+
+            {personalMissions.length > 0 && (
+                <div className="space-y-4">
+                    {personalMissions.map(mission => (
+                        <div key={mission.id} className="bg-[#F5F4EF] p-6 rounded-xl border border-[#929A8A]/50 shadow-lg">
+                            <h3 className="text-xl font-bold text-[#1A1A1A] flex items-center gap-2">
+                                <MissionTargetIcon className="h-6 w-6 text-[#004225]" />
+                                {mission.name}
+                            </h3>
+                            <p className="mt-2 text-[#1A1A1A] text-lg">{mission.description}</p>
+                            <div className="mt-4 bg-[#004225]/10 p-3 rounded-lg">
+                                <p className="font-semibold text-[#004225]">Your Share: <span className="text-2xl font-bold">{mission.share}%</span></p>
+                                <p className="text-sm text-[#004225]/80">This is a team goal. Progress is not tracked individually here.</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
             
             <div className="bg-[#F5F4EF] p-6 rounded-xl border border-[#929A8A]/50 shadow-lg">
                 <div className="flex justify-between items-center mb-4">

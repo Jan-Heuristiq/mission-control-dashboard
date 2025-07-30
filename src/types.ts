@@ -27,6 +27,19 @@ export type Config = {
   value: string;
 }
 
+export type SecondaryMission = {
+  id: number;
+  name: string;
+  description: string;
+};
+
+export type FounderSecondaryMission = {
+  id: number;
+  founder_id: number;
+  mission_id: number;
+  share_percentage: number;
+};
+
 export type DashboardData = {
   totalTarget: number;
   totalMonths: number;
@@ -36,6 +49,8 @@ export type DashboardData = {
   revenueEntries: RevenueEntry[];
   posts: Post[];
   currentMonth: number;
+  secondaryMissions: SecondaryMission[];
+  founderSecondaryMissions: FounderSecondaryMission[];
 };
 
 // Auto-generated Supabase types would go here, but we define them manually for simplicity
@@ -69,6 +84,16 @@ export interface Database {
         Row: Post
         Insert: Omit<Post, 'id' | 'timestamp'> & { timestamp?: string }
         Update: Partial<Post>
+      }
+      secondary_missions: {
+        Row: SecondaryMission
+        Insert: Omit<SecondaryMission, 'id'>
+        Update: Partial<SecondaryMission>
+      },
+      founder_secondary_missions: {
+        Row: FounderSecondaryMission
+        Insert: Omit<FounderSecondaryMission, 'id'>
+        Update: Partial<FounderSecondaryMission>
       }
     }
     Views: {
