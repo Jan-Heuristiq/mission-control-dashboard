@@ -244,14 +244,66 @@ After a minute, Vercel will show you a success page. Click the URL or the screen
 
 ---
 
+## Slack Integration Setup (Optional)
+
+Follow these steps to enable one-click progress updates to a Slack channel.
+
+### Step 1: Create a Slack App
+
+1.  **Go to Slack API:** Navigate to [api.slack.com/apps](https://api.slack.com/apps) and click **"Create New App"**.
+2.  **Choose "From scratch"**: Give your app a name (e.g., "Mission Control Bot") and select the workspace you want to post to. Click **"Create App"**.
+3.  **Add Permissions (Scopes):**
+    *   From the app's settings page, go to **"OAuth & Permissions"** in the sidebar.
+    *   Scroll down to the **"Scopes"** section. Under "Bot Token Scopes," click **"Add an OAuth Scope"**.
+    *   Type and select `chat:write`. This allows the app to post messages.
+4.  **Install App to Workspace:**
+    *   Scroll back to the top of the "OAuth & Permissions" page and click **"Install to Workspace"**.
+    *   Follow the prompts to authorize the app.
+5.  **Copy Your Bot Token:**
+    *   After installation, you will be redirected back. Copy the **"Bot User OAuth Token"**. It starts with `xoxb-`.
+    *   **Keep this token safe. It is a secret.**
+
+### Step 2: Add App to Your Channel
+
+Go to the Slack channel where you want to receive updates (e.g., `#general`), type `/`, and search for "Add apps". Find and add the "Mission Control Bot" you just created.
+
+### Step 3: Configure Vercel Environment Variables
+
+1.  **Go to Vercel:** Open your project settings in Vercel.
+2.  **Navigate to Environment Variables:** In the project settings, click on **"Environment Variables"**.
+3.  **Add the Slack Token:**
+    *   **Name:** `SLACK_BOT_TOKEN`
+    *   **Value:** (Paste the `xoxb-` token you copied from Slack)
+4.  **Add the App URL:**
+    *   **Name:** `VITE_APP_URL`
+    *   **Value:** (Paste the full URL of your Vercel deployment, e.g., `https://your-project-name.vercel.app`)
+5.  **Save** the variables.
+
+### Step 4: Re-deploy in Vercel
+
+1.  Go to the **"Deployments"** tab for your project in Vercel.
+2.  Find the latest deployment, click the "..." menu on the right, and choose **"Redeploy"**.
+3.  Ensure the "Use existing Build Cache" option is **unchecked** to make sure it picks up the new code and environment variables correctly.
+4.  Click **"Redeploy"**.
+
+Once the new deployment is live, the "Post to Slack" button on the Team Dashboard will be active.
+
+---
+
 ## Local Development (Optional)
 
 If you want to run the app on your own computer:
 
-1.  **Prerequisites:** Install [Node.js](https://nodejs.org/).
+1.  **Prerequisites:** Install [Node.js](https://nodejs.org/) and the [Vercel CLI](https://vercel.com/docs/cli) (`npm i -g vercel`).
 2.  **Clone the Repository:** Download the code from GitHub.
 3.  **Install Dependencies:** Open a terminal in the project folder and run `npm install`.
 4.  **Create Environment File:**
-    *   Make a copy of this repository's `.env.example` file and rename it to `.env`.
-    *   Open the new `.env` file and fill in your Supabase URL and Key.
-5.  **Run the App:** In your terminal, run `npm run dev`. It will give you a local URL to open in your browser.
+    *   Create a file named `.env` in the root of the project.
+    *   Add your variables to it like this:
+        ```
+        VITE_SUPABASE_URL="your-supabase-url"
+        VITE_SUPABASE_ANON_KEY="your-supabase-anon-key"
+        SLACK_BOT_TOKEN="your-xoxb-slack-token"
+        VITE_APP_URL="http://localhost:5173" 
+        ```
+5.  **Run the App:** In your terminal, run `vercel dev`. This command runs both the Vite dev server and the Vercel serverless functions locally. It will give you a local URL to open.

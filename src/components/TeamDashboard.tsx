@@ -12,6 +12,7 @@ const LightBulbIcon = ({ className = '' }: { className?: string }) => <svg xmlns
 const PencilIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>;
 const TrashIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.036-2.134H8.71c-1.126 0-2.037.955-2.037 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>;
 const UsersIcon = ({ className = '' }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.962a3.75 3.75 0 015.958 0m0 0a3.75 3.75 0 01-5.958 0M3 13.5g3.75 0 7.5 0M3 13.5V18c0 1.657 1.343 3 3 3h6c1.657 0 3-1.343 3-3v-4.5m-13.5 0c0-4.142 3.358-7.5 7.5-7.5s7.5 3.358 7.5 7.5" /></svg>;
+const SlackIcon = ({ className = '' }: { className?: string }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M94.12 315.5c-.31 0-.62-.03-.94-.06-12.3-1.1-22.38-12-21.28-24.3l1.7-19.6-19.6 1.7c-12.3 1.1-23.25-8.88-24.38-21.18S39.15 229.4 51.45 228.3l19.6-1.7-1.7-19.6c-1.1-12.3 8.88-23.25 21.18-24.38s23 8.88 24.3 21.18l-1.7 19.6 19.6-1.7c12.3-1.1 23.25 8.88 24.38 21.18s-8.88 23-21.18 24.3l-19.6 1.7 1.7 19.6c1.07 12.04-8.49 22.45-20.53 23.54l-.95 .09zm-22.69-142.2c.31 0 .62 .03 .94 .06 12.3 1.1 22.38 12 21.28 24.3l-1.7 19.6 19.6-1.7c12.3-1.1 23.25 8.88 24.38 21.18s-8.88 23-21.18 24.3l-19.6 1.7 1.7 19.6c1.1 12.3-8.88 23.25-21.18 24.38s-23-8.88-24.3-21.18l1.7-19.6-19.6 1.7c-12.3 1.1-23.25-8.88-24.38-21.18s8.88-23 21.18-24.3l19.6-1.7-1.7-19.6c-1.09-12.05 8.49-22.46 20.54-23.55l.95-.08zm229.3-100.8c-.31 0-.62-.03-.94-.06-12.3-1.1-22.38-12-21.28-24.3l1.7-19.6-19.6 1.7c-12.3 1.1-23.25-8.88-24.38-21.18s8.88-23 21.18-24.3l19.6-1.7-1.7-19.6c-1.1-12.3 8.88-23.25 21.18-24.38s23 8.88 24.3 21.18l-1.7 19.6 19.6-1.7c12.3-1.1 23.25 8.88 24.38 21.18s-8.88 23-21.18 24.3l-19.6 1.7 1.7 19.6c1.07 12.04-8.49 22.45-20.53 23.54l-.95 .09zm-22.69-142.2c.31 0 .62 .03 .94 .06 12.3 1.1 22.38 12 21.28 24.3l-1.7 19.6 19.6-1.7c12.3-1.1 23.25 8.88 24.38 21.18s-8.88 23-21.18 24.3l-19.6 1.7 1.7 19.6c1.1 12.3-8.88 23.25-21.18 24.38s-23-8.88-24.3-21.18l1.7-19.6-19.6 1.7c-12.3 1.1-23.25-8.88-24.38-21.18s8.88-23 21.18-24.3l19.6-1.7-1.7-19.6c-1.09-12.05 8.49-22.46 20.54-23.55l.95-.08z"/></svg>;
 
 
 // --- Component Types ---
@@ -91,6 +92,7 @@ const MonthlyMomentumChart: FC<{progress: number}> = ({ progress }) => {
 const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, deletePost, isSubmitting, loggedInUser }) => {
     const { totalTarget, totalMonths, currentMonth, founders, revenueEntries, posts, sprintStartYear, sprintStartMonth, secondaryMissions } = data;
     const [editingPost, setEditingPost] = useState<Post | null>(null);
+    const [isPostingToSlack, setIsPostingToSlack] = useState(false);
 
     const getFounderName = (id: number) => founders.find(f => f.id === id)?.name || 'Unknown';
     const formatCurrency = (value: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
@@ -135,6 +137,46 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
     const handleDeletePost = (postId: number) => { if (window.confirm("Are you sure you want to delete this post?")) { deletePost(postId); } };
     const handleUpdatePost = (text: string, type: 'win' | 'blocker') => { if (editingPost) { updatePost({ ...editingPost, text, type }); setEditingPost(null); } };
     
+    const handlePostToSlack = async () => {
+        setIsPostingToSlack(true);
+        try {
+            const payload = {
+                heuristiqRevenue,
+                totalTarget,
+                heuristiqProgress,
+                thisMonthHeuristiqRevenue,
+                thisMonthHeuristiqTarget,
+                thisMonthHeuristiqProgress,
+                echodeckRevenue,
+                echodeckMission,
+                echodeckArrProgress,
+                echodeckCustomers,
+                thisMonthEchodeckRevenue,
+                thisMonthEchodeckTarget,
+                thisMonthEchodeckProgress,
+            };
+
+            const response = await fetch('/api/post-to-slack', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to post to Slack.');
+            }
+
+            alert('Successfully posted progress to Slack!');
+
+        } catch (error: any) {
+            console.error('Slack Post Error:', error);
+            alert(`Error: ${error.message}`);
+        } finally {
+            setIsPostingToSlack(false);
+        }
+    };
+
     const PostItem = ({ post }: { post: Post }) => (
         <div className="bg-white p-3 rounded-lg animate-fade-in relative group border border-transparent hover:border-[#929A8A]/50">
             <div className="absolute top-2 right-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -155,6 +197,17 @@ const TeamDashboard: FC<TeamDashboardProps> = ({ data, addPost, updatePost, dele
             <Modal isOpen={!!editingPost} onClose={() => setEditingPost(null)} title="Edit Update">
                 {editingPost && <EditPostForm post={editingPost} onSave={handleUpdatePost} onCancel={() => setEditingPost(null)} isSubmitting={isSubmitting} />}
             </Modal>
+
+            <div className="flex justify-end">
+                <button
+                    onClick={handlePostToSlack}
+                    disabled={isPostingToSlack}
+                    className="flex items-center gap-2 bg-white text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-wait transition-colors"
+                >
+                    <SlackIcon className="h-5 w-5" />
+                    {isPostingToSlack ? 'Posting...' : 'Post Progress to Slack'}
+                </button>
+            </div>
 
             {/* --- MISSION 1: SERVICES REVENUE --- */}
             <div className="bg-[#F5F4EF] p-6 rounded-xl border border-[#929A8A]/50 shadow-lg">
